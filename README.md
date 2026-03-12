@@ -62,26 +62,86 @@ docker-compose run --rm basketball-ai pytest
    - Works everywhere, but slower for inference
    - Good for testing code before cloud deployment
 
-## Alternative: Local Virtual Environment
+## Local Development (Recommended for Apple Silicon)
 
-If you prefer faster iteration on your Mac with GPU (Metal):
+For faster iteration during development, use a local Python virtual environment.
+
+### 1. Setup Virtual Environment
 
 ```bash
-# Create virtual environment
-python3 -m venv venv
+# Create virtual environment with Python 3.9
+python3.9 -m venv venv
+source venv/bin/activate
+```
+
+### 2. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 2.5. Set Up Environment Variables
+
+Create a `.env` file in the project root with your API credentials:
+
+```bash
+cp .env.example .env
+```
+
+Then edit `.env` and add your credentials:
+```
+ROBOFLOW_API_KEY=your_roboflow_api_key_here
+```
+
+Get your Roboflow API key from: https://app.roboflow.com/account
+
+**Note:** The `.env` file is git-ignored for security. Never commit it to version control.
+
+### 3. Run Your Scripts
+
+Once activated, run scripts directly:
+```bash
+# With venv activated
+python path/to/script.py
+
+# Or without activating (using explicit interpreter)
+./venv/bin/python path/to/script.py
+```
+
+### 4. Deactivate Virtual Environment
+
+```bash
+deactivate
+```
+
+### 5. Long-term Usage
+
+```bash
+# Each time you open a new terminal in this project
 source venv/bin/activate
 
-# Install dependencies
-pip install -r requirements.txt
+# Then run your code
+python your_script.py
 
-# Run scripts directly
-python main.py
+# When done
+deactivate
 ```
 
-For GPU support with local venv on Apple Silicon:
+### Verify Installation
+
 ```bash
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/cpu
+./venv/bin/python --version  # Should show Python 3.9.23
+./venv/bin/python -c "import torch, cv2, transformers; print('All packages available')"
 ```
+
+### Note on GPU Support
+
+The current setup uses CPU-based PyTorch. For Metal GPU acceleration on Apple Silicon:
+```bash
+pip install --upgrade torch torchvision
+```
+
+This will install Metal-accelerated versions if available for your Python version.
 
 ## Model Training (Cloud)
 

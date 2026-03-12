@@ -39,6 +39,7 @@ ENV/
 .env.local
 
 # Project-specific
+input/
 input_videos/
 output_videos/
 models/
