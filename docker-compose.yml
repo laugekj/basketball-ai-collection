@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  basketball-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: basketball_ai_dev
+    volumes:
+      # Mount the entire project for development
+      - .:/app
+      # Persist pip cache
+      - pip-cache:/root/.cache/pip
+      # Mount data directories
+      - ./input_videos:/app/input_videos
+      - ./output_videos:/app/output_videos
+      - ./models:/app/models
+      - ./results:/app/results
+    environment:
+      - PYTHONUNBUFFERED=1
+    # Uncomment for interactive development
+    # stdin_open: true
+    # tty: true
+    # command: /bin/bash
+
+volumes:
+  pip-cache:
