@@ -4,7 +4,7 @@ import cv2
 import supervision as sv
 import numpy as np
 
-from sports.configs.basketball import BasketballCourtConfiguration
+from configs.basketball import BasketballCourtConfiguration
 
 
 def draw_court(
