@@ -3,6 +3,7 @@ import supervision as sv
 import sys 
 sys.path.append('../')
 from utils import read_stub, save_stub
+from tqdm import tqdm
 
 class PlayerTracker:
     """
@@ -33,8 +34,9 @@ class PlayerTracker:
         """
         batch_size=20 
         detections = [] 
-        for i in range(0,len(frames),batch_size):
-            detections_batch = self.model.predict(frames[i:i+batch_size],conf=0.5)
+        total_batches = (len(frames) + batch_size - 1) // batch_size
+        for i in tqdm(range(0, len(frames), batch_size), desc="Detecting frames", unit="batch", total=total_batches):
+            detections_batch = self.model.predict(frames[i:i+batch_size],conf=0.5, verbose=False)
             detections += detections_batch
         return detections
 
@@ -79,6 +81,6 @@ class PlayerTracker:
 
                 if cls_id == cls_names_inv['Player']:
                     tracks[frame_num][track_id] = {"bbox":bbox}
-        
-        save_stub(stub_path,tracks)
+        if stub_path is not None:
+            save_stub(stub_path,tracks)
         return tracks
