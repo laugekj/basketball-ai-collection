@@ -59,6 +59,7 @@ class PlayerTracker:
         detections = self.detect_frames(frames)
 
         tracks=[]
+        labels_per_frame = []
 
         for frame_num, detection in enumerate(detections):
             cls_names = detection.names
@@ -70,15 +71,27 @@ class PlayerTracker:
             # Track Objects
             detection_with_tracks = self.tracker.update_with_detections(detection_supervision)
 
-            tracks.append({})
+             # Filter only players
+            player_mask = detection_with_tracks.class_id == cls_names_inv['Player']
+            player_detections = detection_with_tracks[player_mask]
 
-            for frame_detection in detection_with_tracks:
-                bbox = frame_detection[0].tolist()
-                cls_id = frame_detection[3]
-                track_id = frame_detection[4]
+            # Create labels (e.g. "ID: 3")
+            labels = [
+                f"ID {tracker_id}"
+                for tracker_id in player_detections.tracker_id
+            ]
 
-                if cls_id == cls_names_inv['Player']:
-                    tracks[frame_num][track_id] = {"bbox":bbox}
+            tracks.append(player_detections)
+            labels_per_frame.append(labels)
+            # tracks.append({})
+
+            # for frame_detection in detection_with_tracks:
+            #     bbox = frame_detection[0].tolist()
+            #     cls_id = frame_detection[3]
+            #     track_id = frame_detection[4]
+
+            #     if cls_id == cls_names_inv['Player']:
+            #         tracks[frame_num][track_id] = {"bbox":bbox}
         
         save_stub(stub_path,tracks)
-        return tracks
+        return tracks, labels_per_frame
