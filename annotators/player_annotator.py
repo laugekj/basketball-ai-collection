@@ -5,7 +5,7 @@ This module provides a lightweight wrapper around the existing drawing utilities
 single-frame player annotations can be reused in notebooks and scripts.
 """
 
-from drawers.utils import draw_ellipse
+from drawers.utils import draw_ellipse, draw_triangle
 
 
 class PlayerAnnotator:
@@ -26,7 +26,7 @@ class PlayerAnnotator:
 		"""
 		self.color = color
 
-	def annotate(self, frame, player_tracks):
+	def annotate(self, frame, player_tracks, ball_aquisition=None):
 		"""
 		Draw tracked players on a frame.
 
@@ -34,6 +34,8 @@ class PlayerAnnotator:
 			frame (numpy.ndarray): Frame to annotate.
 			player_tracks (dict): Dictionary mapping track IDs to player tracking
 				information. Each value is expected to contain a "bbox" entry.
+			ball_aquisition (int, optional): Track ID of the player currently in
+				possession of the ball. If None, no possession marker is drawn.
 
 		Returns:
 			numpy.ndarray: Annotated frame.
@@ -47,5 +49,12 @@ class PlayerAnnotator:
 				self.color,
 				track_id
 			)
+
+			if ball_aquisition is not None and track_id == ball_aquisition:
+				annotated_frame = draw_triangle(
+					annotated_frame,
+					player["bbox"],
+					(0, 0, 255)
+				)
 
 		return annotated_frame
