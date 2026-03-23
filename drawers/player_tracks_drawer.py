@@ -1,4 +1,4 @@
-from .utils import draw_ellipse,draw_traingle
+from .utils import draw_ellipse,draw_triangle
 
 class PlayerTracksDrawer:
     """
@@ -59,7 +59,7 @@ class PlayerTracksDrawer:
                 frame = draw_ellipse(frame, player["bbox"],color, track_id)
 
                 if track_id == player_id_has_ball:
-                    frame = draw_traingle(frame, player["bbox"],(0,0,255))
+                    frame = draw_triangle(frame, player["bbox"],(0,0,255))
 
             output_video_frames.append(frame)
 
