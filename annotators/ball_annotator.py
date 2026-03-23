@@ -5,7 +5,7 @@ This module provides a lightweight wrapper around the existing drawing utilities
 single-frame ball annotations can be reused in notebooks and scripts.
 """
 
-from drawers.utils import draw_traingle as draw_triangle
+from drawers.utils import draw_triangle
 
 
 class BallAnnotator:
