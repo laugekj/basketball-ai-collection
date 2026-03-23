@@ -71,27 +71,27 @@ class PlayerTracker:
             # Track Objects
             detection_with_tracks = self.tracker.update_with_detections(detection_supervision)
 
-             # Filter only players
-            player_mask = detection_with_tracks.class_id == cls_names_inv['Player']
-            player_detections = detection_with_tracks[player_mask]
+            #  # Filter only players
+            # player_mask = detection_with_tracks.class_id == cls_names_inv['Player']
+            # player_detections = detection_with_tracks[player_mask]
 
-            # Create labels (e.g. "ID: 3")
-            labels = [
-                f"ID {tracker_id}"
-                for tracker_id in player_detections.tracker_id
-            ]
+            # # Create labels (e.g. "ID: 3")
+            # labels = [
+            #     f"ID {tracker_id}"
+            #     for tracker_id in player_detections.tracker_id
+            # ]
 
-            tracks.append(player_detections)
-            labels_per_frame.append(labels)
-            # tracks.append({})
+            # tracks.append(player_detections)
+            # labels_per_frame.append(labels)
+            tracks.append({})
 
-            # for frame_detection in detection_with_tracks:
-            #     bbox = frame_detection[0].tolist()
-            #     cls_id = frame_detection[3]
-            #     track_id = frame_detection[4]
+            for frame_detection in detection_with_tracks:
+                bbox = frame_detection[0].tolist()
+                cls_id = frame_detection[3]
+                track_id = frame_detection[4]
 
-            #     if cls_id == cls_names_inv['Player']:
-            #         tracks[frame_num][track_id] = {"bbox":bbox}
+                if cls_id == cls_names_inv['Player']:
+                    tracks[frame_num][track_id] = {"bbox":bbox}
         
         save_stub(stub_path,tracks)
-        return tracks, labels_per_frame
+        return tracks
