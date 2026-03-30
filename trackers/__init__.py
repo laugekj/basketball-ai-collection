@@ -1,3 +1,2 @@
 from .player_tracker import PlayerTracker
-
-__all__ = ['PlayerTracker']
+from .ball_tracker import BallTracker
