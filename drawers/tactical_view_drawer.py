@@ -7,6 +7,19 @@ class TacticalViewDrawer:
         self.team_1_color = team_1_color
         self.team_2_color = team_2_color
 
+    def _to_pixel_point(self, point):
+        """Convert a 2D point-like value to integer pixel coordinates for OpenCV."""
+        if point is None or len(point) < 2:
+            return None
+
+        try:
+            x = int(round(float(point[0])))
+            y = int(round(float(point[1])))
+        except (TypeError, ValueError):
+            return None
+
+        return x, y
+
     def draw(self, 
              video_frames, 
              court_image_path, 
@@ -51,7 +64,11 @@ class TacticalViewDrawer:
             
             # Draw court keypoints
             for keypoint_index, keypoint in enumerate(tactical_court_keypoints):
-                x, y = keypoint
+                pixel_point = self._to_pixel_point(keypoint)
+                if pixel_point is None:
+                    continue
+
+                x, y = pixel_point
                 x += self.start_x
                 y += self.start_y
                 cv2.circle(frame, (x, y), 5, (0, 0, 255), -1)
@@ -71,7 +88,10 @@ class TacticalViewDrawer:
                     color = self.team_1_color if team_id == 1 else self.team_2_color
                     
                     # Adjust position to overlay coordinates
-                    x, y = int(position[0]) + self.start_x, int(position[1]) + self.start_y
+                    pixel_point = self._to_pixel_point(position)
+                    if pixel_point is None:
+                        continue
+                    x, y = pixel_point[0] + self.start_x, pixel_point[1] + self.start_y
                     
                     # Draw player circle
                     player_radius = 8
