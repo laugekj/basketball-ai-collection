@@ -11,42 +11,95 @@ sys.path.append(os.path.join(folder_path,"../"))
 from utils import get_foot_position,measure_distance
 
 class TacticalViewConverter:
+    width: int = 50   
+    length: int = 94  
+    
+    key_length: int = 19
+    key_width: int = 16
+
+    three_point_distance: int = 28 # from baseline to top of the arc
+    three_point_margin: int = 3 # distance from the three point line to the court outline
+    three_point_line_length: int = 14 # length of the straight part of the three point line on the sides
+    
+    hoop_distance: int = 5.3
+    
     def __init__(self, court_image_path):
         self.court_image_path = court_image_path
-        self.width = 300
-        self.height= 161
+        # self.width = 300
+        # self.height= 161
+        self.width = 94
+        self.height = 50
 
         self.actual_width_in_meters=28
         self.actual_height_in_meters=15 
 
+        w = self.__class__.width
+        l = self.__class__.length
+        kw = self.key_width
+        kl = self.key_length
+        tpd = self.three_point_distance
+        tpm = self.three_point_margin
+        hd = self.hoop_distance
+        tpll = self.three_point_line_length
+
         self.key_points = [
-            # left edge
-            (0,0),
-            (0,int((0.91/self.actual_height_in_meters)*self.height)),
-            (0,int((5.18/self.actual_height_in_meters)*self.height)),
-            (0,int((10/self.actual_height_in_meters)*self.height)),
-            (0,int((14.1/self.actual_height_in_meters)*self.height)),
-            (0,int(self.height)),
+            # See my diagram for the numbering of vertices. 
+            # But it goes from top left then down. Go right once, then down.
 
-            # Middle line
-            (int(self.width/2),self.height),
-            (int(self.width/2),0),
+            # Left baseline.
+            (0, 0),                # 1 top left.
+            (0, tpm),              # 2 top left arc.
+            (0, (w - kw) / 2),     # 3 top left key.                
+            (0, (w + kw) / 2),     # 4 bottom left key.
+            (0, w - tpm),          # 5 bottom left arc.
+            (0, w),                # 6 bottom left
+
+            # Left hoop
+            (hd, w / 2),           # 7 left hoop.
+
+            # Left 3pt arc
+            (tpll, tpm),          # 8 top left arc.
+            (tpll, w - tpm),      # 9 bottom left arc.
+
+            # Left ft. line
+            (kl, (w - kw) / 2),   # 10 top right corner of the key
+            (kl, w / 2),          # 11 ft line center of the key
+            (kl, (w + kw) / 2),   # 12 bottom right corner of the key
+
+            # Left court sideline and 3pt top center
+            (tpd, 0),             # 13 halfway between baseline and middle top side
+            (tpd, w / 2),         # 14 top of the 3pt arc center
+            (tpd, w),             # 15 halfway between baseline and middle bottom side
+
+            # Middle of the court
+            (l / 2, 0),            # 16 Top middle of court
+            (l / 2, w / 2),        # 17 center of the court
+            (l / 2, w),            # 18 Bottom middle of court
             
-            # Left Free throw line
-            (int((5.79/self.actual_width_in_meters)*self.width),int((5.18/self.actual_height_in_meters)*self.height)),
-            (int((5.79/self.actual_width_in_meters)*self.width),int((10/self.actual_height_in_meters)*self.height)),
+            # Right court sideline and 3pt top center
+            (l - tpd, 0),          # 19 halfway between baseline and middle top side
+            (l - tpd, w / 2),      # 20 top of the 3pt arc center
+            (l - tpd, w),          # 21 halfway between baseline and middle bottom side
+            
+            # Right ft. line
+            (l - kl, (w - kw) / 2),     # 22 top left corner of the key
+            (l - kl, w / 2),            # 23 ft line center of the key
+            (l - kl, (w + kw) / 2),     # 24 bottom left corner of the key
+            
+            # Right 3pt arc
+            (l - tpll, tpm),      # 25 top corner of the arc away from baseline and sideline
+            (l - tpll, w - tpm),  # 26 bottom corner of the arc away from baseline and sideline RIGHT
 
-            # right edge
-            (self.width,int(self.height)),
-            (self.width,int((14.1/self.actual_height_in_meters)*self.height)),
-            (self.width,int((10/self.actual_height_in_meters)*self.height)),
-            (self.width,int((5.18/self.actual_height_in_meters)*self.height)),
-            (self.width,int((0.91/self.actual_height_in_meters)*self.height)),
-            (self.width,0),
+            # Right hoop
+            (l - hd, w / 2),      # 27 right hoop
 
-            # Right Free throw line
-            (int(((self.actual_width_in_meters-5.79)/self.actual_width_in_meters)*self.width),int((5.18/self.actual_height_in_meters)*self.height)),
-            (int(((self.actual_width_in_meters-5.79)/self.actual_width_in_meters)*self.width),int((10/self.actual_height_in_meters)*self.height)),
+            # Right baseline
+            (l, 0),                # 28 Right top corner of the court
+            (l, tpm),              # 29 top corner of the arc sideline
+            (l, (w - kw) / 2),     # 30 top right corner of the key
+            (l, (w + kw) / 2),     # 31 bottom right corner of the key
+            (l, w - tpm),          # 32 bottom corner of the arc sideline 
+            (l, w),                # 33 right bottom corner of the court
         ]
 
     def validate_keypoints(self, keypoints_list):
@@ -167,9 +220,14 @@ class TacticalViewConverter:
                     # Transform to tactical view coordinates
                     tactical_position = homography.transform_points(player_position)
 
-                    # If tactical position is not in the tactical view, skip
-                    if tactical_position[0][0] < 0 or tactical_position[0][0] > self.width or tactical_position[0][1] < 0 or tactical_position[0][1] > self.height:
+
+                    x, y = tactical_position[0]
+
+                    if not (0 <= x <= self.__class__.length and 0 <= y <= self.__class__.width):
                         continue
+                    # If tactical position is not in the tactical view, skip
+                    #if tactical_position[0][0] < 0 or tactical_position[0][0] > self.width or tactical_position[0][1] < 0 or tactical_position[0][1] > self.height:
+                    #    continue
 
                     tactical_positions[player_id] = tactical_position[0].tolist()
                     
