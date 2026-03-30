@@ -1,4 +1,4 @@
-from .utils import draw_ellipse,draw_triangle
+from .utils import draw_ellipse,draw_traingle
 
 class PlayerTracksDrawer:
     """
@@ -43,23 +43,23 @@ class PlayerTracksDrawer:
 
             player_dict = tracks[frame_num]
 
-            # player_assignment_for_frame = player_assignment[frame_num]
-            
+            player_assignment_for_frame = player_assignment[frame_num]
+
             player_id_has_ball = ball_aquisition[frame_num]
 
             # Draw Players
             for track_id, player in player_dict.items():
-                # team_id = player_assignment_for_frame.get(track_id,self.default_player_team_id)
+                team_id = player_assignment_for_frame.get(track_id,self.default_player_team_id)
 
-                #if team_id == 1:
-                 #   color = self.team_1_color
-                #else:
-                 #   color = self.team_2_color
-                color = [255, 245, 238]
+                if team_id == 1:
+                    color = self.team_1_color
+                else:
+                    color = self.team_2_color
+
                 frame = draw_ellipse(frame, player["bbox"],color, track_id)
 
                 if track_id == player_id_has_ball:
-                    frame = draw_triangle(frame, player["bbox"],(0,0,255))
+                    frame = draw_traingle(frame, player["bbox"],(0,0,255))
 
             output_video_frames.append(frame)
 

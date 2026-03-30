@@ -1,4 +1,4 @@
-from .utils import draw_triangle
+from .utils import draw_traingle
 
 class BallTracksDrawer:
     """
@@ -35,7 +35,7 @@ class BallTracksDrawer:
             for _, ball in ball_dict.items():
                 if ball["bbox"] is None:
                     continue
-                frame = draw_triangle(frame, ball["bbox"],self.ball_pointer_color)
+                frame = draw_traingle(frame, ball["bbox"],self.ball_pointer_color)
 
             output_video_frames.append(frame)
             
