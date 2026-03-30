@@ -20,6 +20,15 @@ class TacticalViewDrawer:
 
         return x, y
 
+    def _scale_point(self, point, scale_x, scale_y):
+        """Scale tactical coordinates into display coordinates."""
+        pixel_point = self._to_pixel_point(point)
+        if pixel_point is None:
+            return None
+
+        x, y = pixel_point
+        return int(round(x * scale_x)), int(round(y * scale_y))
+
     def draw(self, 
              video_frames, 
              court_image_path, 
@@ -28,7 +37,9 @@ class TacticalViewDrawer:
              tactical_court_keypoints,
              tactical_player_positions=None,
              player_assignment=None,
-             ball_acquisition=None):
+             ball_acquisition=None,
+             tactical_source_width=None,
+             tactical_source_height=None):
         """
         Draw tactical view with court keypoints and player positions.
         
@@ -42,10 +53,19 @@ class TacticalViewDrawer:
                 their positions in tactical view coordinates.
             player_assignment (list, optional): List of dictionaries mapping player IDs to team assignments.
             ball_acquisition (list, optional): List indicating which player has the ball in each frame.
+            tactical_source_width (int, optional): Width of tactical coordinate system used by points.
+                If not provided, width is used (no scaling).
+            tactical_source_height (int, optional): Height of tactical coordinate system used by points.
+                If not provided, height is used (no scaling).
             
         Returns:
             list: List of frames with tactical view drawn on them.
         """
+        source_width = tactical_source_width if tactical_source_width else width
+        source_height = tactical_source_height if tactical_source_height else height
+        scale_x = width / source_width
+        scale_y = height / source_height
+
         court_image = cv2.imread(court_image_path)
         court_image = cv2.resize(court_image, (width, height))
 
@@ -64,7 +84,7 @@ class TacticalViewDrawer:
             
             # Draw court keypoints
             for keypoint_index, keypoint in enumerate(tactical_court_keypoints):
-                pixel_point = self._to_pixel_point(keypoint)
+                pixel_point = self._scale_point(keypoint, scale_x, scale_y)
                 if pixel_point is None:
                     continue
 
@@ -88,7 +108,7 @@ class TacticalViewDrawer:
                     color = self.team_1_color if team_id == 1 else self.team_2_color
                     
                     # Adjust position to overlay coordinates
-                    pixel_point = self._to_pixel_point(position)
+                    pixel_point = self._scale_point(position, scale_x, scale_y)
                     if pixel_point is None:
                         continue
                     x, y = pixel_point[0] + self.start_x, pixel_point[1] + self.start_y
