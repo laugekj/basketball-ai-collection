@@ -24,13 +24,13 @@ class CourtKeypointDrawer:
         """
         vertex_annotator = sv.VertexAnnotator(
             color=sv.Color.from_hex(self.keypoint_color),
-            radius=8)
+            radius=4)
         
         vertex_label_annotator = sv.VertexLabelAnnotator(
             color=sv.Color.from_hex(self.keypoint_color),
             text_color=sv.Color.WHITE,
-            text_scale=0.5,
-            text_thickness=1
+            text_scale=0.25,
+            text_thickness=0.5
         )
         
         output_frames = []
