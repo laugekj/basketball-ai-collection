@@ -13,18 +13,21 @@ class PlayerAnnotator:
 	Annotate tracked players on a single frame.
 
 	Attributes:
-		color (list): BGR color used to draw the player ellipse and label box.
+		team_colors (dict): Mapping from team or class id to BGR annotation color.
 	"""
 
-	def __init__(self, color=[255, 245, 238]):
+	def __init__(self, team_colors=None):
 		"""
-		Initialize the annotator with the drawing color for players.
+		Initialize the annotator with team-specific drawing colors.
 
 		Args:
-			color (list, optional): BGR color for player annotation.
-				Defaults to [255, 245, 238].
+			team_colors (dict, optional): Mapping from class or team id to BGR color.
+				Defaults to colors for ids 0 and 1.
 		"""
-		self.color = color
+		self.team_colors = team_colors or {
+			0: [255, 245, 238],
+			1: [128, 0, 0],
+		}
 
 	def annotate(self, frame, player_tracks, ball_aquisition=None):
 		"""
@@ -43,10 +46,14 @@ class PlayerAnnotator:
 		annotated_frame = frame.copy()
 
 		for track_id, player in player_tracks.items():
+			player_color = self.team_colors.get(
+				player.get("class_id"),
+				self.team_colors[0]
+			)
 			annotated_frame = draw_ellipse(
 				annotated_frame,
 				player["bbox"],
-				self.color,
+				player_color,
 				track_id
 			)
 
