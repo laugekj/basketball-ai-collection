@@ -30,7 +30,7 @@ class TeamBallControlDrawer:
             if ball_aquisition_frame not in player_assignment_frame:
                 team_ball_control.append(-1)
                 continue
-            if player_assignment_frame[ball_aquisition_frame] == 1:
+            if player_assignment_frame[ball_aquisition_frame]['class_id'] == 1:
                 team_ball_control.append(1)
             else:
                 team_ball_control.append(2)
