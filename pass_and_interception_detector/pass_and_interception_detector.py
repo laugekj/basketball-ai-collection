@@ -33,12 +33,11 @@ class PassAndInterceptionDetector():
             current_holder = ball_acquisition[frame]
             
             if prev_holder != -1 and current_holder != -1 and prev_holder != current_holder:
-                prev_team = player_assignment[previous_frame]['class_id'].get(prev_holder, -1)
-                current_team = player_assignment[frame]['class_id'].get(current_holder, -1)
+                prev_team = player_assignment[previous_frame].get(prev_holder, -1)
+                current_team = player_assignment[frame].get(current_holder, -1)
 
-                if prev_team == current_team and prev_team != -1:
-                    passes[frame] = prev_team
-
+                if prev_team['class_id'] == current_team['class_id'] and prev_team['class_id'] != -1:
+                    passes[frame] = prev_team['class_id']
         return passes
 
     def detect_interceptions(self,ball_acquisition,player_assignment):
@@ -66,10 +65,10 @@ class PassAndInterceptionDetector():
             current_holder = ball_acquisition[frame]
             
             if prev_holder != -1 and current_holder != -1 and prev_holder != current_holder:
-                prev_team = player_assignment[previous_frame]['class_id'].get(prev_holder, -1)
-                current_team = player_assignment[frame]['class_id'].get(current_holder, -1)
-
-                if prev_team != current_team and prev_team != -1 and current_team != -1:
-                    interceptions[frame] = current_team
+                prev_team = player_assignment[previous_frame].get(prev_holder, -1)
+                current_team = player_assignment[frame].get(current_holder, -1)
+                
+                if prev_team['class_id'] != current_team['class_id'] and prev_team['class_id'] != -1 and current_team['class_id'] != -1:
+                    interceptions[frame] = current_team['class_id']
         
         return interceptions
